@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Text.RegularExpressions;
 using MXANH.DTO.Request.UserRequestDTO;
 using MXANH.Models;
 using MXANH.Repositories.Interfaces;
@@ -7,14 +8,17 @@ namespace MXANH.Services.Implementations
 {
     public class UserService : IUserService
     {
+        private readonly IWebHostEnvironment _env;
+
         private readonly IUserRepository _userRepository;
 
         private readonly IPointsTransactionRepository _pointsTransactionReository;
 
-        public UserService(IUserRepository userRepository, IPointsTransactionRepository pointsTransactionReository)
+        public UserService(IUserRepository userRepository, IPointsTransactionRepository pointsTransactionReository, IWebHostEnvironment env)
         {
             _userRepository = userRepository;
             _pointsTransactionReository = pointsTransactionReository;
+            _env = env;
         }
         public async Task<User> GetUserByIdAsync(int id)
         {
@@ -38,6 +42,17 @@ namespace MXANH.Services.Implementations
         }
         public async Task AddUserAsync(CreateUserRequestDTO userRequest)
         {
+            if (userRequest.Dob > DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                throw new Exception("Date of birth cannot be in the future");
+            }
+            var phoneRegex = new Regex(@"^(0[3|5|7|8|9])[0-9]{8}$");
+            if (!phoneRegex.IsMatch(userRequest.PhoneNumber))
+            {
+                throw new Exception("Invalid Vietnamese phone number");
+            }
+
+
             var user = new User
             {
                 Name = userRequest.Name,
@@ -45,10 +60,12 @@ namespace MXANH.Services.Implementations
                 Email = userRequest.Email,
                 Username = userRequest.Username,
                 Password = userRequest.Password,
+                AvatarUrl = "/images/avatars/8226745b-8f08-48cc-a1e3-75c5fbb4f07c.png",
                 Gender = userRequest.Gender,
-                AvatarUrl = userRequest.AvatarUrl,
+                Points = 0,
                 CreatedAt = DateTime.UtcNow,
                 UpdateAt = DateTime.UtcNow,
+                Dob = userRequest.Dob,
             };
 
             await _userRepository.AddUserAsync(user);
@@ -62,6 +79,12 @@ namespace MXANH.Services.Implementations
             {
                 throw new Exception("User not found");
             }
+
+            if (existingUser.Dob > DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                throw new Exception("Date of birth cannot be in the future");
+            }
+
             // Update the user properties as needed
             existingUser.Name = user.Name;
             existingUser.PhoneNumber = user.PhoneNumber;
@@ -69,9 +92,8 @@ namespace MXANH.Services.Implementations
             existingUser.Username = user.Username;
             existingUser.AvatarUrl = user.AvatarUrl;
             existingUser.Gender = user.Gender;
-            existingUser.Points = user.Points;
             existingUser.UpdateAt = DateTime.UtcNow;
-
+            existingUser.Dob = user.Dob;
 
             await _userRepository.UpdateUserAsync(existingUser);
         }
@@ -109,6 +131,31 @@ namespace MXANH.Services.Implementations
             await _userRepository.UpdateUserAsync(user);
         }
 
+
+        public async Task<string> UploadAvatarAsync(int userId, IFormFile avatarFile)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null) throw new Exception("User not found");
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(avatarFile.FileName);
+            var folderPath = Path.Combine(_env.WebRootPath, "images", "avatars");
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            var filePath = Path.Combine(folderPath, fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await avatarFile.CopyToAsync(stream);
+            }
+
+            var relativeUrl = $"/images/avatars/{fileName}";
+            user.AvatarUrl = relativeUrl;
+            await _userRepository.UpdateUserAsync(user);
+
+            return relativeUrl;
+        }
 
 
     }

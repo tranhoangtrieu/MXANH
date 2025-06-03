@@ -75,7 +75,17 @@ namespace MXANH.Controllers.UserControllers
             return Ok(new { message = "Withdrawal successful", remaining = user.Points });
         }
 
+
+        [HttpPost("avatar/{id}")]
+        public async Task<IActionResult> UploadAvatar(int id, IFormFile avatar)
+        {
+            if (avatar == null || avatar.Length == 0)
+                return BadRequest("Invalid file");
+
+            var avatarUrl = await _userService.UploadAvatarAsync(id, avatar);
+            return Ok(new { avatarUrl });
+        }
+
+
     }
-
-
 }

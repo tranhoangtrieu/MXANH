@@ -17,5 +17,7 @@ namespace MXANH.Services.Interfaces
         Task<int> GetBalance(int id);
 
         Task WithdrawPoints(int id, WithdrawRequest request);
+
+        Task<string> UploadAvatarAsync(int userId, IFormFile avatarFile);
     }
 }

@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using MXANH.Repositories.Implementations;
+using MXANH.Repositories.Interfaces;
 using MXANH.Services.Implementations;
 using MXANH.Services.Interfaces;
 

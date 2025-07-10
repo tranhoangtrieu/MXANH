@@ -1,6 +1,6 @@
-﻿namespace MXANH.Models
+﻿namespace MXANH.DTO.Response.AddressResponseDTO
 {
-    public class Address
+    public class AddressResponseDTO
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -9,7 +9,5 @@
         public string? PostalCode { get; set; }
         public bool IsDefault { get; set; } = false; // Default is not default
 
-        public User User { get; set; }
     }
-
 }

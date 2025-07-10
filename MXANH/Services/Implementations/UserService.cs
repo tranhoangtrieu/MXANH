@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
 using MXANH.DTO.Request.UserRequestDTO;
+using MXANH.DTO.Response.UserResponseDTO;
 using MXANH.Models;
 using MXANH.Repositories.Interfaces;
 using MXANH.Services.Interfaces;
@@ -20,10 +21,16 @@ namespace MXANH.Services.Implementations
             _pointsTransactionReository = pointsTransactionReository;
             _env = env;
         }
+        public async Task<UserResponseDTO> GetUserResponseDTOByIdAsync(int id)
+        {
+            return await _userRepository.GetUserResponseDTOByIdAsync(id);
+        }
+
         public async Task<User> GetUserByIdAsync(int id)
         {
             return await _userRepository.GetUserByIdAsync(id);
         }
+
         public async Task<User> GetUserByPhoneNumberAsync(string phoneNumber)
         {
             return await _userRepository.GetUserByPhoneNumberAsync(phoneNumber);
@@ -36,7 +43,7 @@ namespace MXANH.Services.Implementations
         {
             return await _userRepository.GetUserByUsernameAsync(username);
         }
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserResponseDTO>> GetAllUsersAsync()
         {
             return await _userRepository.GetAllUsersAsync();
         }
@@ -59,7 +66,7 @@ namespace MXANH.Services.Implementations
                 PhoneNumber = userRequest.PhoneNumber,
                 Email = userRequest.Email,
                 Username = userRequest.Username,
-                Password = userRequest.Password,
+                Password = BCrypt.Net.BCrypt.HashPassword(userRequest.Password),
                 AvatarUrl = "/images/avatars/8226745b-8f08-48cc-a1e3-75c5fbb4f07c.png",
                 Gender = userRequest.Gender,
                 Points = 0,
@@ -134,6 +141,8 @@ namespace MXANH.Services.Implementations
 
         public async Task<string> UploadAvatarAsync(int userId, IFormFile avatarFile)
         {
+
+
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null) throw new Exception("User not found");
 

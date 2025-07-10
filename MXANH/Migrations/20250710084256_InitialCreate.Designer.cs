@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MXANH.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250516104534_UpdateUsersDateime")]
-    partial class UpdateUsersDateime
+    [Migration("20250710084256_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -210,16 +210,21 @@ namespace MXANH.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -228,9 +233,43 @@ namespace MXANH.Migrations
                     b.Property<decimal>("PricePerKg")
                         .HasColumnType("numeric");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.ToTable("Materials");
+                });
+
+            modelBuilder.Entity("MXANH.Models.MaterialDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AdditionalPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("DetailDescription")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DetailName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialId");
+
+                    b.ToTable("MaterialDetails");
                 });
 
             modelBuilder.Entity("MXANH.Models.Order", b =>
@@ -410,6 +449,17 @@ namespace MXANH.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MXANH.Models.MaterialDetail", b =>
+                {
+                    b.HasOne("MXANH.Models.Material", "Material")
+                        .WithMany("Details")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+                });
+
             modelBuilder.Entity("MXANH.Models.Order", b =>
                 {
                     b.HasOne("MXANH.Models.MarketplaceProduct", "Product")
@@ -472,6 +522,8 @@ namespace MXANH.Migrations
             modelBuilder.Entity("MXANH.Models.Material", b =>
                 {
                     b.Navigation("CollectionRequests");
+
+                    b.Navigation("Details");
                 });
 
             modelBuilder.Entity("MXANH.Models.User", b =>

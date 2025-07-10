@@ -206,13 +206,25 @@ namespace MXANH.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
+<<<<<<< HEAD
+=======
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+>>>>>>> e471c7a462fc9cee093391febb5e1dc1e35f95aa
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -220,12 +232,19 @@ namespace MXANH.Migrations
                     b.Property<decimal>("PricePerKg")
                         .HasColumnType("numeric");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.ToTable("Materials");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("MXANH.Models.MaterialImage", b =>
+=======
+            modelBuilder.Entity("MXANH.Models.MaterialDetail", b =>
+>>>>>>> e471c7a462fc9cee093391febb5e1dc1e35f95aa
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -233,10 +252,26 @@ namespace MXANH.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+<<<<<<< HEAD
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
 
+=======
+                    b.Property<decimal>("AdditionalPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("DetailDescription")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DetailName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+>>>>>>> e471c7a462fc9cee093391febb5e1dc1e35f95aa
                     b.Property<int>("MaterialId")
                         .HasColumnType("integer");
 
@@ -244,7 +279,11 @@ namespace MXANH.Migrations
 
                     b.HasIndex("MaterialId");
 
+<<<<<<< HEAD
                     b.ToTable("MaterialImages");
+=======
+                    b.ToTable("MaterialDetails");
+>>>>>>> e471c7a462fc9cee093391febb5e1dc1e35f95aa
                 });
 
             modelBuilder.Entity("MXANH.Models.Order", b =>
@@ -464,10 +503,17 @@ namespace MXANH.Migrations
                     b.Navigation("User");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("MXANH.Models.MaterialImage", b =>
                 {
                     b.HasOne("MXANH.Models.Material", "Material")
                         .WithMany("Images")
+=======
+            modelBuilder.Entity("MXANH.Models.MaterialDetail", b =>
+                {
+                    b.HasOne("MXANH.Models.Material", "Material")
+                        .WithMany("Details")
+>>>>>>> e471c7a462fc9cee093391febb5e1dc1e35f95aa
                         .HasForeignKey("MaterialId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -538,7 +584,11 @@ namespace MXANH.Migrations
                 {
                     b.Navigation("CollectionRequests");
 
+<<<<<<< HEAD
                     b.Navigation("Images");
+=======
+                    b.Navigation("Details");
+>>>>>>> e471c7a462fc9cee093391febb5e1dc1e35f95aa
                 });
 
             modelBuilder.Entity("MXANH.Models.User", b =>

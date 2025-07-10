@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MXANH.Repositories.Implementations;
 using MXANH.Repositories.Interfaces;
+using MXANH.Services;
+
 using MXANH.Services.Implementations;
 using MXANH.Services.Interfaces;
 
@@ -16,6 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["DatabaseOptions:PostgreSQLConnection"];
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();

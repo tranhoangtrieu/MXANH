@@ -18,7 +18,7 @@ namespace MXANH.Controllers.MaterialControllers
         [HttpGet]
         public async Task<IActionResult> GetAllActiveMaterials()
         {
-            var materials = await _materialService.GetAllActiveMaterialAsync();
+            var materials = await _materialService.GetAllActiveMaterialsAsync();
             return Ok(materials);
         }
 
@@ -31,6 +31,34 @@ namespace MXANH.Controllers.MaterialControllers
                 return NotFound();
             }
             return Ok(material);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchMaterials([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Search query cannot be empty");
+            }
+            var materials = await _materialService.SearchMaterialsAsync(query);
+            return Ok(materials);
+        }
+
+        [HttpGet("category/{category}")]
+        public async Task<IActionResult> GetMaterialsByCategory(string category)
+        {
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                return BadRequest("Category cannot be empty");
+            }
+            var materials = await _materialService.GetMaterialsByCategoryAsync(category);
+            return Ok(materials);
+        }
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await _materialService.GetAllCategoriesAsync();
+            return Ok(categories);
         }
 
         [HttpPost]

@@ -15,9 +15,9 @@ namespace MXANH.Services
             _materialRepository = materialRepository;
         }
 
-        public async Task<IEnumerable<MaterialResponseDTO>> GetAllActiveMaterialAsync()
+        public async Task<IEnumerable<MaterialResponseDTO>> GetAllActiveMaterialsAsync()
         {
-            var materials = await _materialRepository.GetAllActiveMaterialAsync();
+            var materials = await _materialRepository.GetAllActiveMaterialsAsync();
             return materials.Select(m => new MaterialResponseDTO
             {
                 Id = m.Id,
@@ -48,6 +48,43 @@ namespace MXANH.Services
                 CreatedAt = material.CreatedAt,
                 UpdatedAt = material.UpdatedAt
             };
+        }
+
+        public async Task<IEnumerable<MaterialResponseDTO>> SearchMaterialsAsync(string keyword)
+        {
+            var materials = await _materialRepository.SearchMaterialsAsync(keyword);
+            return materials.Select(m => new MaterialResponseDTO
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                PricePerKg = m.PricePerKg,
+                Category = m.Category,
+                ImageUrl = m.ImageUrl,
+                CreatedAt = m.CreatedAt,
+                UpdatedAt = m.UpdatedAt
+            });
+        }
+
+        public async Task<IEnumerable<MaterialResponseDTO>> GetMaterialsByCategoryAsync(string category)
+        {
+            var materials = await _materialRepository.GetMaterialsByCategoryAsync(category);
+            return materials.Select(m => new MaterialResponseDTO
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Description = m.Description,
+                PricePerKg = m.PricePerKg,
+                Category = m.Category,
+                ImageUrl = m.ImageUrl,
+                CreatedAt = m.CreatedAt,
+                UpdatedAt = m.UpdatedAt
+            });
+        }
+
+        public async Task<IEnumerable<string>> GetAllCategoriesAsync()
+        {
+            return await _materialRepository.GetAllCategoriesAsync();
         }
 
         public async Task<MaterialResponseDTO> AddMaterialAsync(CreateMaterialRequestDTO request)

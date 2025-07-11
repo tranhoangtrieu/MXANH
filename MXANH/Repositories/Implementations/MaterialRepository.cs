@@ -13,7 +13,7 @@ namespace MXANH.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Material>> GetAllActiveMaterialAsync()
+        public async Task<IEnumerable<Material>> GetAllActiveMaterialsAsync()
         {
             return await _context.Materials
                 .Where(w => w.IsActive)
@@ -30,26 +30,51 @@ namespace MXANH.Repositories
                 .FirstOrDefaultAsync(w => w.Id == id && w.IsActive);
         }
 
-        public async Task<IEnumerable<Material>> SearchMaterialAsync(string keyword)
+        public async Task<IEnumerable<Material>> SearchMaterialsAsync(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
-                return await GetAllActiveMaterialAsync();
+                return await GetAllActiveMaterialsAsync();
 
-            var searchTerm = keyword.ToLower().Trim();
+            var searchTerm = RemoveDiacritics(keyword.ToLower().Trim());
 
-            return await _context.Materials
-                .Where(w => w.IsActive &&
-                           (w.Name.ToLower().Contains(searchTerm) ||
-                            (w.Description != null && w.Description.ToLower().Contains(searchTerm))))
+            return _context.Materials
+                .Where(w => w.IsActive)
                 .Include(w => w.Details.Where(d => d.IsActive))
+                .AsEnumerable() // Switch to client-side for diacritic-insensitive search
+                .Where(w =>
+                {
+                    var name = RemoveDiacritics(w.Name?.ToLower() ?? "");
+                    var desc = RemoveDiacritics(w.Description?.ToLower() ?? "");
+                    return name.Contains(searchTerm) || desc.Contains(searchTerm);
+                })
                 .OrderBy(w => w.Name)
-                .ToListAsync();
+                .ToList(); // Use ToList instead of ToListAsync since the query is now client-side
         }
 
-        public async Task<IEnumerable<Material>> GetMaterialByCategoryAsync(string category)
+        // Helper method to remove Vietnamese diacritics
+        private static string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var normalized = text.Normalize(System.Text.NormalizationForm.FormD);
+            var sb = new System.Text.StringBuilder();
+
+            foreach (var c in normalized)
+            {
+                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
+        public async Task<IEnumerable<Material>> GetMaterialsByCategoryAsync(string category)
         {
             if (string.IsNullOrWhiteSpace(category))
-                return await GetAllActiveMaterialAsync();
+                return await GetAllActiveMaterialsAsync();
 
             return await _context.Materials
                 .Where(w => w.IsActive && w.Category.ToLower() == category.ToLower())
@@ -58,7 +83,7 @@ namespace MXANH.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<string>> GetCategoriesAsync()
+        public async Task<IEnumerable<string>> GetAllCategoriesAsync()
         {
             return await _context.Materials
                 .Where(w => w.IsActive)

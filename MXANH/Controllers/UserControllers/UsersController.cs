@@ -19,7 +19,7 @@ namespace MXANH.Controllers.UserControllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var user = await _userService.GetUserByIdAsync(id);
+            var user = await _userService.GetUserResponseDTOByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -31,8 +31,6 @@ namespace MXANH.Controllers.UserControllers
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
-
-
             return Ok(users);
         }
 

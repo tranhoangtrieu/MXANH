@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using MXANH.DTO.Request.UserRequestDTO;
 using MXANH.Models;
 using MXANH.Services.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
 
 namespace MXANH.Controllers.UserControllers
 {
@@ -16,7 +19,7 @@ namespace MXANH.Controllers.UserControllers
             _userService = userService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("by-id/{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
             var user = await _userService.GetUserResponseDTOByIdAsync(id);
@@ -26,6 +29,45 @@ namespace MXANH.Controllers.UserControllers
             }
             return Ok(user);
         }
+
+
+
+        [HttpGet("by-token/{token}")]
+        public async Task<IActionResult> GetUserByToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return BadRequest("Token không được để trống.");
+            }
+
+            try
+            {
+                // Giải mã token để lấy userId
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                Console.WriteLine(jwtToken);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "userId");
+                if (userIdClaim == null)
+                {
+                    return BadRequest("Token không chứa userId.");
+                }
+
+                int userId = int.Parse(userIdClaim.Value);
+
+                var user = await _userService.GetUserResponseDTOByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound("Không tìm thấy người dùng.");
+                }
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Token không hợp lệ: " + ex.Message);
+            }
+        }
+        
 
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()

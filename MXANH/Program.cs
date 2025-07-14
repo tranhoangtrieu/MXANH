@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MXANH.Repositories;
 using MXANH.Repositories.Implementations;
 using MXANH.Repositories.Interfaces;
 using MXANH.Services;
@@ -29,45 +30,8 @@ builder.Services.AddScoped<IPointsTransactionService, PointsTransactionService>(
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
-
-
-
-
-// JWT Authentication
-//builder.Services.AddAuthentication("Bearer")
-//    .AddJwtBearer("Bearer", options =>
-//    {
-//        var jwtSettings = builder.Configuration.GetSection("Jwt");
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuer = true,
-//            ValidateAudience = true,
-//            ValidateLifetime = true,
-//            ValidateIssuerSigningKey = true,
-//            ValidIssuer = jwtSettings["Issuer"],
-//            ValidAudience = jwtSettings["Audience"],
-//            IssuerSigningKey = new SymmetricSecurityKey(
-//                Encoding.UTF8.GetBytes(jwtSettings["Key"]))
-//        };
-//    });
-
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-//})
-//.AddCookie(options =>
-//{
-//    options.Cookie.SameSite = SameSiteMode.None; // hoặc None nếu domain khác
-//    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // nếu dùng HTTPS
-//})
-//.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-//{
-//    options.ClientId = "995709795687-o4u3d1s1hp1rvp1g8nns50t9q6v7n5r6.apps.googleusercontent.com";
-//    options.ClientSecret = "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";
-//    options.CallbackPath = "/api/Auth/google-callback"; // đường dẫn này phải khớp với Google Developer Console
-//});
-
+builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
+builder.Services.AddScoped<IMaterialService, MaterialService>();
 
 
 builder.Services.AddAuthentication(options =>
@@ -137,10 +101,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .AllowAnyHeader()
+           .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
-            .WithOrigins("http://localhost:3000"); // hoặc domain của frontend của bạn
+            .WithOrigins("http://localhost:63553"); // hoặc domain của frontend của bạn
     });
 });
 
@@ -151,8 +115,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
+app.UseCors("AllowFrontend");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -164,7 +129,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
 app.UseSwaggerUI();
 }
-app.UseCors("AllowFrontend");
 
 app.UseSession();
 

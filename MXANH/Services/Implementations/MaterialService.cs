@@ -58,7 +58,8 @@ namespace MXANH.Services
                 Description = request.Description,
                 PricePerKg = request.PricePerKg,
                 Category = request.Category,
-                ImageUrl = request.ImageUrl
+                ImageUrl = request.ImageUrl,
+                UpdatedAt = DateTime.UtcNow
             };
 
             var createdMaterial = await _materialRepository.AddMaterialAsync(material);
@@ -71,7 +72,8 @@ namespace MXANH.Services
                 PricePerKg = createdMaterial.PricePerKg,
                 Category = createdMaterial.Category,
                 ImageUrl = createdMaterial.ImageUrl,
-                CreatedAt = createdMaterial.CreatedAt
+                CreatedAt = createdMaterial.CreatedAt,
+                UpdatedAt =  createdMaterial.UpdatedAt
             };
         }
 

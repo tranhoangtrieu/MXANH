@@ -119,7 +119,7 @@ namespace MXANH.Services
                 PricePerKg = request.PricePerKg,
                 Category = request.Category,
 
-                ImageUrl = request.ImageUrl,
+                ImageUrl = imageUrl,
                 UpdatedAt = DateTime.UtcNow
             };
 

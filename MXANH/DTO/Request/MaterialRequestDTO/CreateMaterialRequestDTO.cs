@@ -15,6 +15,6 @@ namespace MXANH.DTO.Request.MaterialRequestDTO
         [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         public decimal PricePerKg { get; set; }
         public string Category { get; set; }
-        public string ImageUrl { get; set; }
+        public IFormFile ImageFile { get; set; }
     }
 }

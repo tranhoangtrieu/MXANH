@@ -19,8 +19,6 @@ public class AppDbContext : DbContext
     public DbSet<UserEvent> UserEvents { get; set; }
     public DbSet<EnterpriseProfile> EnterpriseProfiles { get; set; }
 
-    public DbSet<OtpCode> OtpCodes { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // User - Address (1:N)
@@ -70,28 +68,5 @@ public class AppDbContext : DbContext
             .HasOne(ue => ue.Event)
             .WithMany(e => e.UserEvents)
             .HasForeignKey(ue => ue.EventId);
-
-        var roleConverter = new ValueConverter<UsersEnum, string>(
-               v => v.ToString(),
-               v => (UsersEnum)Enum.Parse(typeof(UsersEnum), v)
-           );
-
-        var genderConverter = new ValueConverter<GendersEnum, string>(
-            v => v.ToString(),
-            v => (GendersEnum)Enum.Parse(typeof(GendersEnum), v)
-        );
-
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.Property(e => e.Role)
-                  .HasConversion(roleConverter)
-                  .HasMaxLength(20); // optional: limit length
-
-            entity.Property(e => e.Gender)
-                  .HasConversion(genderConverter)
-                  .HasMaxLength(10); // optional
-        });
-
-        base.OnModelCreating(modelBuilder);
     }
 }

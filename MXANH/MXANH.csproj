@@ -32,6 +32,7 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\Images\Avatars\" />
+    <Folder Include="wwwroot\Images\materials\" />
   </ItemGroup>
 
 </Project>

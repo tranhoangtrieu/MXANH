@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MXANH.DTO.Response.AddressResponseDTO;
+using MXANH.DTO.Response.UserResponseDTO;
 using MXANH.Models;
 using MXANH.Repositories.Interfaces;
 
@@ -12,10 +14,43 @@ namespace MXANH.Repositories.Implementations
             _context = context;
         }
         // Implement IUserRepository methods here
-
         public async Task<User> GetUserByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);
+        }
+
+
+        public async Task<UserResponseDTO> GetUserResponseDTOByIdAsync(int id)
+        {
+            var user = await _context.Users.Select(
+
+               u => new UserResponseDTO
+               {
+                   Id = u.Id,
+                   Name = u.Name,
+                   PhoneNumber = u.PhoneNumber,
+                   Email = u.Email,
+                   Username = u.Username,
+                   Points = u.Points,
+                   Dob = u.Dob,
+                   AvatarUrl = u.AvatarUrl,
+                   CreatedAt = u.CreatedAt,
+                   UpdateAt = u.UpdateAt,
+                   IsActive = u.IsActive,
+                   
+                   Addresses = u.Addresses.Select(a => new Address
+                   {
+                       Id = a.Id,
+                       UserId = a.UserId,
+                       Street = a.Street,
+                       City = a.City,
+                       IsDefault = a.IsDefault,
+
+                   }).ToList()
+               }).FirstOrDefaultAsync();
+
+
+            return user;
         }
         public async Task<User> GetUserByPhoneNumberAsync(string phoneNumber)
         {
@@ -29,9 +64,35 @@ namespace MXANH.Repositories.Implementations
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserResponseDTO>> GetAllUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users.Select(
+
+                u => new UserResponseDTO
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    PhoneNumber = u.PhoneNumber,
+                    Email = u.Email,
+                    Username = u.Username,
+                    Points = u.Points,
+                    Dob = u.Dob,
+                    AvatarUrl = u.AvatarUrl,
+                    CreatedAt = u.CreatedAt,
+                    UpdateAt = u.UpdateAt,
+                    IsActive = u.IsActive,
+                    Addresses = u.Addresses.Select(a => new Address
+                    {
+                        Id = a.Id,
+                        UserId = a.UserId,
+                        Street = a.Street,
+                        City = a.City,
+                        IsDefault = a.IsDefault,
+
+                    }).ToList()
+                }).ToListAsync();
+
+           return users;
         }
         public async Task AddUserAsync(User user)
         {
@@ -45,12 +106,13 @@ namespace MXANH.Repositories.Implementations
         }
         public async Task DeleteUserAsync(int id)
         {
-            var user = await GetUserByIdAsync(id);
-            if (user != null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
+                return; // User not found, nothing to delete
             }
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
 
 
         }

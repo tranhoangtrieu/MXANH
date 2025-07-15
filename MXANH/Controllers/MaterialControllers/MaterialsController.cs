@@ -62,24 +62,23 @@ namespace MXANH.Controllers.MaterialControllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMaterial([FromBody] CreateMaterialRequestDTO materialRequest)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CreateMaterial([FromForm] CreateMaterialRequestDTO materialRequest)
         {
             if (materialRequest == null)
-            {
                 return BadRequest("Material data is null");
-            }
 
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var createdMaterial = await _materialService.AddMaterialAsync(materialRequest);
             return CreatedAtAction(nameof(GetMaterialById), new { id = createdMaterial.Id }, createdMaterial);
         }
 
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMaterial(int id, [FromBody] UpdateMaterialRequestDTO materialRequest)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateMaterial(int id, [FromForm] UpdateMaterialRequestDTO materialRequest)
         {
             if (materialRequest == null)
             {
@@ -110,6 +109,29 @@ namespace MXANH.Controllers.MaterialControllers
             }
 
             return NoContent();
+        }
+
+        [HttpPost("upload/{id}")]
+        public async Task<IActionResult> UploadMaterialImage(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded");
+            }
+            try
+            {
+                var imageUrl = await _materialService.UploadMaterialImageAsync(id, file);
+                if (string.IsNullOrEmpty(imageUrl))
+                {
+                    return StatusCode(500, "Error uploading image");
+                }
+                return Ok(new { ImageUrl = imageUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            
         }
     }
 }

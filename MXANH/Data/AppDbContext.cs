@@ -14,7 +14,6 @@ public class AppDbContext : DbContext
     public DbSet<MarketplaceProduct> MarketplaceProducts { get; set; }
     public DbSet<Material> Materials { get; set; }
     public DbSet<MaterialDetail> MaterialDetails { get; set; }
-
     public DbSet<CollectionRequest> CollectionRequests { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<UserEvent> UserEvents { get; set; }

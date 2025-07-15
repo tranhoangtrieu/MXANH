@@ -13,5 +13,6 @@ namespace MXANH.Services.Interfaces
         Task<MaterialResponseDTO> AddMaterialAsync(CreateMaterialRequestDTO request);
         Task<MaterialResponseDTO> UpdateMaterialAsync(int id, UpdateMaterialRequestDTO request);
         Task<bool> DeleteMaterialAsync(int id);
+        Task<string> UploadMaterialImageAsync(int id, IFormFile imageFile);
     }
 }

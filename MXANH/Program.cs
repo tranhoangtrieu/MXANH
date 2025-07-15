@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MXANH.Repositories;
 using MXANH.Repositories.Implementations;
 using MXANH.Repositories.Interfaces;
 using MXANH.Services;
@@ -24,6 +25,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
+builder.Services.AddScoped<IMaterialService, MaterialService>();
 builder.Services.AddScoped<IPointsTransactionRepository, PointsTransactionRepository>();
 builder.Services.AddScoped<IPointsTransactionService, PointsTransactionService>();
 builder.Services.AddScoped<AuthService>();

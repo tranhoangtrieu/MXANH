@@ -10,6 +10,7 @@ using MXANH.Services.Implementations;
 using MXANH.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using MXANH.DTO.Request.UserRequestDTO;
 
 namespace MXANH.Controllers.AuthController
 {
@@ -29,19 +30,19 @@ namespace MXANH.Controllers.AuthController
             _context = context;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
-        {
-            var user = await _userService.GetUserByUsernameAsync(loginRequest.Username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password))
-            {
-                return NotFound("User not found");
-            }
-            var token = _authService.GenerateToken(user);
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+        //{
+        //    var user = await _userService.GetUserByUsernameAsync(loginRequest.Username);
+        //    if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password))
+        //    {
+        //        return NotFound("User not found");
+        //    }
+        //    var token = _authService.GenerateToken(user);
 
-            return Ok(new { token });
+        //    return Ok(new { token });
 
-        }
+        //}
 
 
 
@@ -78,6 +79,27 @@ namespace MXANH.Controllers.AuthController
 
             return Ok("OTP đã được gửi.");
         }
+
+        [HttpPost("Active-account")]
+        public async Task<IActionResult> ActiveAccount([FromBody] ActiveAccountRequest rq)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == rq.PhoneNumber);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            user.Name = rq.UserName;
+            if (string.IsNullOrEmpty(user.Name))
+            {
+                return BadRequest("Tên đăng nhập không được để trống.");
+            }
+            user.IsActive = true;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return Ok("Tài khoản đã được kích hoạt thành công.");
+        }
+
+
 
 
         [HttpPost("verify-otp")]
@@ -118,7 +140,7 @@ namespace MXANH.Controllers.AuthController
                {
                    PhoneNumber = req.PhoneNumber,
                    CreatedAt = DateTime.UtcNow,
-                   IsActive = true,
+                   IsActive = false,
 
                };
                 _context.Users.Add(user);
@@ -126,13 +148,16 @@ namespace MXANH.Controllers.AuthController
             }
             else
             {
-                user.IsActive = true;
                 _context.Users.Update(user);
             }
 
             await _context.SaveChangesAsync();
             var token = _authService.GenerateToken(user);
-            return Ok(new { token });
+            return Ok(new { 
+            token = token,
+            userId = user.Id,
+            isActive = user.IsActive,
+            });
         }
 
 

@@ -60,6 +60,7 @@ namespace MXANH.Services.Implementations
             }
 
 
+            CreateUserRequestDTO userRequest1 = userRequest;
             var user = new User
             {
                 Name = userRequest.Name,
@@ -142,7 +143,6 @@ namespace MXANH.Services.Implementations
         public async Task<string> UploadAvatarAsync(int userId, IFormFile avatarFile)
         {
 
-
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null) throw new Exception("User not found");
 
@@ -165,7 +165,7 @@ namespace MXANH.Services.Implementations
 
             return relativeUrl;
         }
-
+        //https://localhost:7123/images/avatars/ec78d8e8-40d9-4a9c-879e-4297255fb450.jpg
 
     }
 }

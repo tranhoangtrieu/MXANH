@@ -9,6 +9,9 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Address> Addresses { get; set; }
+
+    public DbSet<OtpCode> OtpCodes { get; set; }
+
     public DbSet<PointsTransaction> PointsTransactions { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<MarketplaceProduct> MarketplaceProducts { get; set; }
